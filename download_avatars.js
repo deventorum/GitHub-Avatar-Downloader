@@ -14,7 +14,11 @@ function getRepoContributors(repoOwner, repoName, cb) {
   
 	if (repoOwner == undefined || repoName == undefined) {
 		throw 'Repo owner name and/or repo have been specified incorrectly, please provide valid arguments';
-	} 
+	}
+	// creates an avatar folder
+	fs.mkdir('./avatar', function(err) {
+		console.log('Error :', err);
+	});
 	// make an API request passing an authorization data to the header
 	const options = {
 		url: 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contributors',

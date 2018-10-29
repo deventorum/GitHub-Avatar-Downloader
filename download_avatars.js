@@ -1,15 +1,22 @@
+// Variables that accessing modules
 const request = require('request');
 const fs = require('fs');
-
-//accesing authorization token
 const token = require('./secrets.js');
+
+// Variables that tracks user's input
+const userInput = process.argv.slice(2);
+const ownerName = userInput[0];
+const repoName = userInput[1];
 
 console.log('Welcome to the GitHub Avatar Downloader!');
 
 function getRepoContributors(repoOwner, repoName, cb) {
   
+	if (repoOwner == undefined || repoName == undefined) {
+		throw 'Repo owner name and/or repo have been specified incorrectly, please provide valid arguments';
+	} 
 	// make an API request passing an authorization data to the header
-	var options = {
+	const options = {
 		url: 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contributors',
 		headers: {
 			'User-Agent': 'request',
@@ -22,7 +29,7 @@ function getRepoContributors(repoOwner, repoName, cb) {
 	});
 }
 
-getRepoContributors('jquery', 'jquery', function(err, result) {
+getRepoContributors(ownerName, repoName, function(err, result) {
 	result = JSON.parse(result);
 	// Helper function is being called for every contributor to save avatar images
 	result.forEach(element => {
@@ -36,6 +43,9 @@ function downloadImageByURL(url, filePath) {
 		.on('error', function (err) {                                  
 			throw err; 
 		})
-		.pipe(fs.createWriteStream(filePath));
-		
+		.pipe(fs.createWriteStream(filePath))
+	  // UI to notify user about the progress
+		.on('finish', function() {
+			console.log('Image has been downloaded');
+		}); 
 }
